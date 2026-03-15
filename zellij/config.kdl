@@ -1,0 +1,44 @@
+// Zellij configuration
+
+keybinds clear-defaults=false {
+    normal {
+        // Prefix key to enter other modes
+        bind "Ctrl a" {
+            SwitchToMode "tmux";
+        }
+    }
+    tmux {
+        bind "[" { SwitchToMode "Scroll"; }
+        bind "Ctrl a" { Write 2; SwitchToMode "Normal"; }
+        bind "\\" { NewPane "Right"; SwitchToMode "Normal"; }
+        bind "-" { NewPane "Down"; SwitchToMode "Normal"; }
+        bind "z" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
+        bind "c" { NewTab; SwitchToMode "Normal"; }
+        bind "," { SwitchToMode "RenameTab"; }
+        bind "p" { GoToPreviousTab; SwitchToMode "Normal"; }
+        bind "n" { GoToNextTab; SwitchToMode "Normal"; }
+        bind "h" { MoveFocus "Left"; SwitchToMode "Normal"; }
+        bind "j" { MoveFocus "Down"; SwitchToMode "Normal"; }
+        bind "k" { MoveFocus "Up"; SwitchToMode "Normal"; }
+        bind "l" { MoveFocus "Right"; SwitchToMode "Normal"; }
+        bind "d" { Detach; }
+        bind "Space" { NextSwapLayout; SwitchToMode "Normal"; }
+        bind "x" { CloseFocus; SwitchToMode "Normal"; }
+    }
+}
+
+// Use tmux-style prefix (Ctrl+a)
+default_mode "normal"
+
+// UI options
+pane_frames false
+simplified_ui false
+
+// Theme
+theme "night-owl"
+
+// On startup, don't show the welcome screen
+show_startup_tips false
+
+// Use zsh for panes/tabs
+default_shell "zsh"
