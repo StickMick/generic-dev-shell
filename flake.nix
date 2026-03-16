@@ -38,6 +38,7 @@
           source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
           eval "$(zoxide init zsh)"
           eval "$(direnv hook zsh)"
+          alias cd=z
           ZSHEOF
 
                     export SHELL="${pkgs.zsh}/bin/zsh"
