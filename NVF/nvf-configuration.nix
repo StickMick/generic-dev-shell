@@ -66,7 +66,7 @@
       lspSignature.enable = false; # conflicts with blink
       otter-nvim.enable = true;
       nvim-docs-view.enable = true;
-      formatOnSave = true;
+      formatOnSave = false;
     };
 
     telescope.enable = true;
