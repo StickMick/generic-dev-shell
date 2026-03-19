@@ -4,9 +4,152 @@
   ...
 }: {
   vim = {
+    viAlias = false;
+    vimAlias = true;
+
+    globals = {
+      mapleader = " ";
+      maplocalleader = " ";
+    };
+
     options = {
       shada = "'100,<50,s10,h"; # safe default enabling shada with common parameters
       mouse = "a"; # enable mouse support in all modles
+      number = true;
+      relativenumber = false;
+      clipboard = "unnamedplus";
+      breakindent = true;
+      undofile = true;
+      ignorecase = true;
+      smartcase = true;
+      signcolumn = "yes";
+      updatetime = 250;
+      timeoutlen = 300;
+      splitright = true;
+      splitbelow = true;
+      list = true;
+      listchars = "tab:» ,trail:·,nbsp:␣";
+      inccommand = "split";
+      cursorline = true;
+      scrolloff = 10;
+      confirm = true;
+    };
+
+    # Basic keymaps similar to kickstart.nvim
+    maps = {
+      normal = {
+        # Clear search highlights on <Esc>
+        "<Esc>" = {
+          action = "<cmd>nohlsearch<CR>";
+          desc = "Clear search highlights";
+        };
+
+        # Diagnostic keymaps
+        "<leader>q" = {
+          action = "vim.diagnostic.setloclist";
+          lua = true;
+          desc = "Open diagnostic [Q]uickfix list";
+        };
+
+        # Window navigation with Ctrl+hjkl
+        "<C-h>" = {
+          action = "<C-w><C-h>";
+          desc = "Move focus to the left window";
+        };
+        "<C-l>" = {
+          action = "<C-w><C-l>";
+          desc = "Move focus to the right window";
+        };
+        "<C-j>" = {
+          action = "<C-w><C-j>";
+          desc = "Move focus to the lower window";
+        };
+        "<C-k>" = {
+          action = "<C-w><C-k>";
+          desc = "Move focus to the upper window";
+        };
+
+        # Telescope keymaps
+        "<leader>sh" = {
+          action = "<cmd>Telescope help_tags<CR>";
+          desc = "[S]earch [H]elp";
+        };
+        "<leader>sk" = {
+          action = "<cmd>Telescope keymaps<CR>";
+          desc = "[S]earch [K]eymaps";
+        };
+        "<leader>sf" = {
+          action = "<cmd>Telescope find_files<CR>";
+          desc = "[S]earch [F]iles";
+        };
+        "<leader>ss" = {
+          action = "<cmd>Telescope builtin<CR>";
+          desc = "[S]earch [S]elect Telescope";
+        };
+        "<leader>sw" = {
+          action = "<cmd>Telescope grep_string<CR>";
+          desc = "[S]earch current [W]ord";
+        };
+        "<leader>sg" = {
+          action = "<cmd>Telescope live_grep<CR>";
+          desc = "[S]earch by [G]rep";
+        };
+        "<leader>sd" = {
+          action = "<cmd>Telescope diagnostics<CR>";
+          desc = "[S]earch [D]iagnostics";
+        };
+        "<leader>sr" = {
+          action = "<cmd>Telescope resume<CR>";
+          desc = "[S]earch [R]esume";
+        };
+        "<leader>s." = {
+          action = "<cmd>Telescope oldfiles<CR>";
+          desc = "[S]earch Recent Files";
+        };
+        "<leader>sc" = {
+          action = "<cmd>Telescope commands<CR>";
+          desc = "[S]earch [C]ommands";
+        };
+        "<leader><leader>" = {
+          action = "<cmd>Telescope buffers<CR>";
+          desc = "[ ] Find existing buffers";
+        };
+        "<leader>/" = {
+          action = "<cmd>Telescope current_buffer_fuzzy_find<CR>";
+          desc = "[/] Fuzzily search in current buffer";
+        };
+        "<leader>s/" = {
+          action = "<cmd>Telescope live_grep grep_open_files=true<CR>";
+          desc = "[S]earch [/] in Open Files";
+        };
+        "<leader>sn" = {
+          action = ''<cmd>lua require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") })<CR>'';
+          desc = "[S]earch [N]eovim files";
+        };
+
+        # Format buffer
+        "<leader>f" = {
+          action = "vim.lsp.buf.format";
+          lua = true;
+          desc = "[F]ormat buffer";
+        };
+      };
+
+      terminal = {
+        # Exit terminal mode easier
+        "<Esc><Esc>" = {
+          action = "<C-\\><C-n>";
+          desc = "Exit terminal mode";
+        };
+      };
+
+      visual = {
+        # Search current word in visual mode
+        "<leader>sw" = {
+          action = "<cmd>Telescope grep_string<CR>";
+          desc = "[S]earch current [W]ord";
+        };
+      };
     };
 
     theme = {
@@ -24,6 +167,13 @@
     binds = {
       whichKey = {
         enable = true;
+        # Register key groups similar to kickstart.nvim
+        register = {
+          "<leader>s" = "+[S]earch";
+          "<leader>t" = "+[T]oggle";
+          "<leader>h" = "+Git [H]unk";
+          "gr" = "+LSP Actions";
+        };
       };
       cheatsheet = {
         enable = true;
@@ -67,6 +217,32 @@
       otter-nvim.enable = true;
       nvim-docs-view.enable = true;
       formatOnSave = false;
+
+      # LSP keybindings similar to kickstart.nvim
+      mappings = {
+        # Rename symbol
+        renameSymbol = "grn";
+        # Code action
+        codeAction = "gra";
+        # Go to declaration
+        goToDeclaration = "grD";
+        # Go to definition
+        goToDefinition = "grd";
+        # Find references
+        listReferences = "grr";
+        # Go to implementation
+        listImplementations = "gri";
+        # Go to type definition
+        goToType = "grt";
+        # Document symbols
+        listDocumentSymbols = "gO";
+        # Workspace symbols
+        listWorkspaceSymbols = "gW";
+        # Next diagnostic
+        nextDiagnostic = "]d";
+        # Previous diagnostic
+        previousDiagnostic = "[d";
+      };
     };
 
     telescope.enable = true;
@@ -187,6 +363,17 @@
     };
 
     treesitter.context.enable = true;
+
+    # Autocommands similar to kickstart.nvim
+    autocmds = [
+      {
+        # Highlight when yanking (copying) text
+        event = ["TextYankPost"];
+        pattern = ["*"];
+        command = "lua vim.highlight.on_yank()";
+        desc = "Highlight when yanking (copying) text";
+      }
+    ];
 
     projects = {
       project-nvim.enable = true;
