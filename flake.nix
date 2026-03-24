@@ -14,7 +14,7 @@
     flake-utils,
     ...
   }:
-    flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux"] (
+    flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = import nixpkgs {
           inherit system;
@@ -22,32 +22,35 @@
         };
 
         neovimCfg = nvf.lib.neovimConfiguration {
-          pkgs = pkgs;
+          inherit pkgs;
           modules = [./NVF/nvf-configuration.nix];
         };
 
+        customNeovim = neovimCfg.neovim;
+
+        zshrcContent =
+          builtins.replaceStrings
+          ["@OH_MY_ZSH@" "@ZSH_AUTOSUGGESTIONS@" "@ZSH_SYNTAX_HIGHLIGHTING@"]
+          [
+            "${pkgs.oh-my-zsh}/share/oh-my-zsh"
+            "${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+            "${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+          ]
+          (builtins.readFile ./zsh/devshell.zsh);
+
         commonShellHook = ''
-                    # Generate a per-session Zsh config
-                    export ZDOTDIR=$(mktemp -d)
-                    cat > "$ZDOTDIR/.zshrc" << 'ZSHEOF'
-          export ZSH="${pkgs.oh-my-zsh}/share/oh-my-zsh"
-          ZSH_THEME="ys"
-          plugins=(git)
-          source "$ZSH/oh-my-zsh.sh"
-          source ${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-          source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-          eval "$(zoxide init zsh)"
-          eval "$(direnv hook zsh)"
-          alias cd=z
-          vis() { nvim $(fzf --query="$1" --preview 'bat --style=numbers --color=always {}') }
+          # Generate a per-session Zsh config
+          export ZDOTDIR=$(mktemp -d)
+          cat > "$ZDOTDIR/.zshrc" << 'ZSHEOF'
+          ${zshrcContent}
           ZSHEOF
 
-                    export SHELL="${pkgs.zsh}/bin/zsh"
+          export SHELL="${pkgs.zsh}/bin/zsh"
 
-                    if [ -z "$ZELLIJ" ]; then
-                      exec zellij --config ${./zellij/config.kdl}
-                    fi
-                    exec "$SHELL"
+          if [ -z "$ZELLIJ" ]; then
+            exec zellij --config ${./zellij/config.kdl}
+          fi
+          exec "$SHELL"
         '';
 
         commonPackages = with pkgs; [
@@ -61,7 +64,7 @@
           zsh-syntax-highlighting
 
           # Editor (NVF-configured Neovim)
-          neovimCfg.neovim
+          customNeovim
 
           # Terminal multiplexer
           zellij
@@ -97,37 +100,43 @@
           htop
           direnv # per-directory env variables
         ];
+
+        mkDevShell = {
+          name,
+          additionalPackages ? [],
+        }:
+          pkgs.mkShell {
+            inherit name;
+            shellHook = commonShellHook;
+            buildInputs = commonPackages ++ additionalPackages;
+          };
       in {
-        devShells.default = pkgs.mkShell {
+        packages.neovim = customNeovim;
+
+        devShells.default = mkDevShell {
           name = "devtools";
-          shellHook = commonShellHook;
-          packages = commonPackages;
         };
 
-        devShells.dotnet = pkgs.mkShell {
+        devShells.dotnet = mkDevShell {
           name = "dotnet-dev";
-          shellHook = commonShellHook;
-          packages =
-            commonPackages
-            ++ (with pkgs; [
-              dotnet-sdk_8
-              omnisharp-roslyn
-              netcoredbg
-              csharpier
-            ]);
+          additionalPackages = with pkgs; [
+            dotnet-sdk_8
+            omnisharp-roslyn
+            netcoredbg
+            csharpier
+          ];
         };
 
-        devShells.angular = pkgs.mkShell {
+        devShells.angular = mkDevShell {
           name = "angular-dev";
-          shellHook = commonShellHook;
-          packages =
-            commonPackages
-            ++ (with pkgs; [
-              nodejs_24
-              nodePackages.npm
-              nodePackages."@angular/cli"
-            ]);
+          additionalPackages = with pkgs; [
+            nodejs_22
+            nodePackages.npm
+            nodePackages."@angular/cli"
+          ];
         };
+
+        formatter = pkgs.alejandra;
       }
     );
 }
