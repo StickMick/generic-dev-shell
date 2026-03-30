@@ -6,6 +6,8 @@ keybinds clear-defaults=false {
         bind "Ctrl a" {
             SwitchToMode "tmux";
         }
+        // unbind quick exit
+        unbind "Ctrl q"
     }
     tmux {
         bind "[" { SwitchToMode "Scroll"; }
@@ -38,7 +40,7 @@ simplified_ui false
 theme "night-owl"
 
 // On startup, don't show the welcome screen
-show_startup_tips false
+show_startup_tips true
 
 // Use zsh for panes/tabs
 default_shell "zsh"

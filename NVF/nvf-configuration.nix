@@ -14,9 +14,8 @@
 
     options = {
       shada = "'100,<50,s10,h"; # safe default enabling shada with common parameters
-      mouse = "a"; # enable mouse support in all modles
       number = true;
-      relativenumber = false;
+      relativenumber = true;
       clipboard = "unnamedplus";
       breakindent = true;
       undofile = true;
@@ -331,6 +330,72 @@
               processId = require("dap.utils").pick_process,
             },
           }
+        '';
+        sources.typescript = ''
+          local dap = require("dap")
+
+          dap.adapters["pwa-node"] = {
+            type = "server",
+            host = "localhost",
+            port = "''${port}",
+            executable = {
+              command = "${pkgs.vscode-js-debug}/bin/js-debug",
+              args = { "''${port}" },
+            },
+          }
+
+          dap.adapters["pwa-msedge"] = {
+            type = "server",
+            host = "localhost",
+            port = "''${port}",
+            executable = {
+              command = "${pkgs.vscode-js-debug}/bin/js-debug",
+              args = { "''${port}" },
+            },
+          }
+
+          for _, language in ipairs({ "typescript", "javascript", "typescriptreact", "javascriptreact" }) do
+            dap.configurations[language] = {
+              {
+                type = "pwa-msedge",
+                name = "Launch Edge (Angular)",
+                request = "launch",
+                url = "http://localhost:4200",
+                webRoot = "''${workspaceFolder}",
+                sourceMaps = true,
+                runtimeExecutable = "${pkgs.microsoft-edge}/bin/microsoft-edge",
+                runtimeArgs = { "--remote-debugging-port=9222", "--user-data-dir=/tmp/edge-debug" },
+                skipFiles = { "<node_internals>/**", "node_modules/**" },
+              },
+              {
+                type = "pwa-msedge",
+                name = "Attach to Edge",
+                request = "attach",
+                port = 9222,
+                webRoot = "''${workspaceFolder}",
+                sourceMaps = true,
+                skipFiles = { "<node_internals>/**", "node_modules/**" },
+              },
+              {
+                type = "pwa-node",
+                name = "Launch Node",
+                request = "launch",
+                program = "''${file}",
+                cwd = "''${workspaceFolder}",
+                sourceMaps = true,
+                skipFiles = { "<node_internals>/**" },
+              },
+              {
+                type = "pwa-node",
+                name = "Attach to Node",
+                request = "attach",
+                processId = require("dap.utils").pick_process,
+                cwd = "''${workspaceFolder}",
+                sourceMaps = true,
+                skipFiles = { "<node_internals>/**" },
+              },
+            }
+          end
         '';
       };
     };

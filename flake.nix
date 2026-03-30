@@ -92,6 +92,17 @@
 
           github-copilot-cli
 
+          # C Sharp
+          dotnet-sdk_8
+          omnisharp-roslyn
+          netcoredbg
+          csharpier
+
+          # Angular
+          nodejs_22
+          nodePackages.npm
+          nodePackages."@angular/cli"
+
           # Utilities
           jq
           yq-go
@@ -116,27 +127,6 @@
         devShells.default = mkDevShell {
           name = "devtools";
         };
-
-        devShells.dotnet = mkDevShell {
-          name = "dotnet-dev";
-          additionalPackages = with pkgs; [
-            dotnet-sdk_8
-            omnisharp-roslyn
-            netcoredbg
-            csharpier
-          ];
-        };
-
-        devShells.angular = mkDevShell {
-          name = "angular-dev";
-          additionalPackages = with pkgs; [
-            nodejs_22
-            nodePackages.npm
-            nodePackages."@angular/cli"
-          ];
-        };
-
-        formatter = pkgs.alejandra;
       }
     );
 }
