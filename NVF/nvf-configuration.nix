@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }: {
   vim = {
@@ -216,6 +217,16 @@
       otter-nvim.enable = true;
       nvim-docs-view.enable = true;
       formatOnSave = false;
+
+      servers.csharp_ls = {
+        cmd = lib.mkForce [
+          "${pkgs.writeShellScript "csharp-ls-wrapper" ''
+            export DOTNET_ROOT="${pkgs.dotnet-sdk_9}/share/dotnet"
+            export PATH="${pkgs.dotnet-sdk_9}/bin:$PATH"
+            exec ${pkgs.csharp-ls}/bin/csharp-ls "$@"
+          ''}"
+        ];
+      };
 
       # LSP keybindings similar to kickstart.nvim
       mappings = {

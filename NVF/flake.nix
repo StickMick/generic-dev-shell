@@ -45,6 +45,7 @@
               pkgs."pkg-config"
               pkgs.gnumake
               pkgs.gcc
+              pkgs.dotnet-sdk_9
             ];
           };
         };
