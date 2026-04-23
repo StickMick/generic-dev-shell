@@ -93,6 +93,7 @@
           dotnet-sdk_8
           dotnet-sdk_10
           omnisharp-roslyn
+          roslyn-ls
           netcoredbg
           csharpier
 
