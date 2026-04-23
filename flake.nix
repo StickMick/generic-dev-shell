@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -11,6 +12,7 @@
     self,
     nixpkgs,
     nixpkgs-stable,
+    nixpkgs-unstable,
     flake-utils,
     ...
   }:
@@ -22,6 +24,11 @@
         };
 
         pkgsStable = import nixpkgs-stable {
+          inherit system;
+          config.allowUnfree = true;
+        };
+
+        pkgsUnstable = import nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
         };
@@ -61,7 +68,8 @@
           zsh-autosuggestions
           zsh-syntax-highlighting
 
-          neovim
+          pkgsUnstable.neovim
+          tree-sitter
 
           # Terminal multiplexer (pinned to nixos-24.11, zellij 0.41.1)
           pkgsStable.zellij
@@ -70,6 +78,7 @@
           git
           lazygit
           git-credential-manager # cross-platform credential helper (GCM)
+          git-credential-oauth
 
           # Fuzzy finder
           fzf
