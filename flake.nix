@@ -19,8 +19,6 @@
           config.allowUnfree = true;
         };
 
-        customNeovim = neovimCfg.neovim;
-
         zshrcContent =
           builtins.replaceStrings
           ["@OH_MY_ZSH@" "@ZSH_AUTOSUGGESTIONS@" "@ZSH_SYNTAX_HIGHLIGHTING@"]
@@ -86,6 +84,7 @@
 
           # C Sharp
           dotnet-sdk_8
+          dotnet-sdk_10
           omnisharp-roslyn
           netcoredbg
           csharpier
@@ -114,8 +113,6 @@
             buildInputs = commonPackages ++ additionalPackages;
           };
       in {
-        packages.neovim = customNeovim;
-
         devShells.default = mkDevShell {
           name = "devtools";
         };
