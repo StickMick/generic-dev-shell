@@ -25,7 +25,7 @@
           pkgs = pkgs;
           modules = [./nvf-configuration.nix];
         };
-        _ =
+        neovimVersionGuard =
           if pkgs.lib.versionAtLeast neovimCfg.neovim.version "0.12.0"
           then null
           else throw "Neovim ${neovimCfg.neovim.version} is too old. Required: >= 0.12.0.";
