@@ -20,6 +20,10 @@
           inherit system;
           config.allowUnfree = true;
         };
+        neovimPackage =
+          if pkgs.lib.versionAtLeast pkgs.neovim.version "0.12.0"
+          then pkgs.neovim
+          else throw "Neovim ${pkgs.neovim.version} is too old. Required: >= 0.12.0.";
 
         pkgsStable = import nixpkgs-stable {
           inherit system;
@@ -61,7 +65,7 @@
           zsh-autosuggestions
           zsh-syntax-highlighting
 
-          neovim
+          neovimPackage
 
           # Terminal multiplexer (pinned to nixos-24.11, zellij 0.41.1)
           pkgsStable.zellij
