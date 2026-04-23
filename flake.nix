@@ -58,6 +58,13 @@
           exec "$SHELL"
         '';
 
+        dotnet-full =
+          with pkgs.dotnetCorePackages;
+            combinePackages [
+              sdk_8_0
+              sdk_10_0
+            ];
+
         commonPackages = with pkgs; [
           # Interactive bash (with programmable completion support)
           bashInteractive
@@ -99,8 +106,6 @@
           github-copilot-cli
 
           # C Sharp
-          dotnet-sdk_8
-          dotnet-sdk_10
           omnisharp-roslyn
           roslyn-ls
           netcoredbg
@@ -118,7 +123,7 @@
           wget
           htop
           direnv # per-directory env variables
-        ];
+        ] ++ [ dotnet-full ];
 
         mkDevShell = {
           name,
