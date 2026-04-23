@@ -3,14 +3,12 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    nvf.url = "github:notashelf/nvf";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = {
     self,
     nixpkgs,
-    nvf,
     flake-utils,
     ...
   }:
@@ -19,11 +17,6 @@
         pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true;
-        };
-
-        neovimCfg = nvf.lib.neovimConfiguration {
-          inherit pkgs;
-          modules = [./NVF/nvf-configuration.nix];
         };
 
         customNeovim = neovimCfg.neovim;
@@ -63,8 +56,7 @@
           zsh-autosuggestions
           zsh-syntax-highlighting
 
-          # Editor (NVF-configured Neovim)
-          customNeovim
+          neovim
 
           # Terminal multiplexer
           zellij
