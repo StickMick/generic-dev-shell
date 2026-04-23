@@ -38,7 +38,7 @@
 
           export SHELL="${pkgs.zsh}/bin/zsh"
 
-          if [ -z "$ZELLIJ" ]; then
+          if [ -z "$ZELLIJ" ] && command -v zellij >/dev/null 2>&1; then
             exec zellij --config ${./zellij/config.kdl}
           fi
           exec "$SHELL"
@@ -55,9 +55,6 @@
           zsh-syntax-highlighting
 
           neovim
-
-          # Terminal multiplexer
-          zellij
 
           # Version control
           git
