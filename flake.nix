@@ -3,18 +3,25 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = {
     self,
     nixpkgs,
+    nixpkgs-stable,
     flake-utils,
     ...
   }:
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
+
+        pkgsStable = import nixpkgs-stable {
           inherit system;
           config.allowUnfree = true;
         };
@@ -38,7 +45,7 @@
 
           export SHELL="${pkgs.zsh}/bin/zsh"
 
-          if [ -z "$ZELLIJ" ] && command -v zellij >/dev/null 2>&1; then
+          if [ -z "$ZELLIJ" ]; then
             exec zellij --config ${./zellij/config.kdl}
           fi
           exec "$SHELL"
@@ -55,6 +62,9 @@
           zsh-syntax-highlighting
 
           neovim
+
+          # Terminal multiplexer (pinned to nixos-24.11, zellij 0.41.1)
+          pkgsStable.zellij
 
           # Version control
           git
