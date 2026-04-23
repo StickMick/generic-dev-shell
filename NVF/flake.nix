@@ -26,8 +26,8 @@
           modules = [./nvf-configuration.nix];
         };
       in
-        assert pkgs.lib.versionAtLeast neovimCfg.neovim.version "0.12.0";
-        {
+        if pkgs.lib.versionAtLeast neovimCfg.neovim.version "0.12.0"
+        then {
         # Expose the configured Neovim as the package for this system
         packages.default = neovimCfg.neovim;
         defaultPackage = neovimCfg.neovim;
@@ -50,7 +50,8 @@
               pkgs.dotnet-sdk_9
             ];
           };
-        };
+        }
+        else throw "Neovim ${neovimCfg.neovim.version} is too old. Required: >= 0.12.0.";
       }
     );
 }
