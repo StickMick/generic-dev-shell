@@ -2,15 +2,17 @@
   description = "General development tools";
 
   inputs = {
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-beta.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = {
     self,
     nixpkgs,
+    nixpkgs-beta,
     nixpkgs-stable,
     nixpkgs-unstable,
     flake-utils,
@@ -18,6 +20,16 @@
   }:
     flake-utils.lib.eachDefaultSystem (
       system: let
+        pkgsUnstable = import nixpkgs-unstable {
+          inherit system;
+          config.allowUnfree = true;
+        };
+
+        pkgsBeta = import nixpkgs-beta {
+          inherit system;
+          config.allowUnfree = true;
+        };
+
         pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true;
@@ -28,10 +40,6 @@
           config.allowUnfree = true;
         };
 
-        pkgsUnstable = import nixpkgs-unstable {
-          inherit system;
-          config.allowUnfree = true;
-        };
 
         zshrcContent =
           builtins.replaceStrings
@@ -79,7 +87,7 @@
           tree-sitter
 
           # Terminal multiplexer (pinned to nixos-24.11, zellij 0.41.1)
-          pkgsStable.zellij
+          pkgsBeta.zellij
 
           # Version control
           git
@@ -115,6 +123,7 @@
           nodejs_22
           nodePackages.npm
           nodePackages."@angular/cli"
+          angular-language-server
 
           # Utilities
           jq
@@ -122,6 +131,7 @@
           curl
           wget
           htop
+          unzip
           direnv # per-directory env variables
         ] ++ [ dotnet-full ];
 
